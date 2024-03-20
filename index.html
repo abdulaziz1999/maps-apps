@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Tutorial Google Map - Petani Kode</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+</head>
+
+<body>
+
+    <div id="map" style="width:100%;height:550px;"></div>
+
+    <script>
+        //var map = L.map('map').setView([-2.5489, 118.0149], 5); // Adjusted coordinates for Indonesia's center
+        //L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        //    maxZoom: 19,
+        //    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        //}).addTo(map);
+
+        //var circle = L.circle([-0.027498379228427995, 109.3353211820494], {
+        //    color: 'green',
+        //    fillColor: '#f03',
+        //    fillOpacity: 0.5,
+        //    radius: 500
+        //}).addTo(map);
+
+        //fetch('http://localhost:9005/api/geoGrafi')
+        //.then(response => response.json())
+        //.then(data => {
+        //    data.forEach(item => {
+        //        var marker = L.marker([item.latitude,item.longitude]).bindPopup("<b> IHC</b><hr> " + item.nama_lokasi).addTo(map);
+        //    });
+        //})
+        //.catch(error => console.error('Error:', error));
+
+
+        //var itSurabaya = L.marker([-7.212662324957308, 112.73318028047231]).addTo(map);
+        //var grahaRspp = L.marker([-6.239806910439034, 106.79326546813473]).addTo(map);
+        //var grhaPertamina = L.marker([-6.177354973287332, 106.83163609999998]).addTo(map);
+        //var rspCirebon = L.marker([-6.683915904218249, 108.55214557999425]).addTo(map);
+        //grahaRspp.bindPopup("<b>RS PUSAT PERTAMINA</b><hr> HSSE RSPP - GEDUNG GRAHA", { autoClose: false });
+        //itSurabaya.bindPopup("<b>RS LAVALETTE</b> <br> IT SURABAYA", { autoClose: false });
+        //grhaPertamina.bindPopup("<b>KLINIK PERTAMINA</b> <br> GRHA PERTAMINA - BUILDING PERTAMAX TOWER (LT.15-17TH)", { autoClose: false });
+        //rspCirebon.bindPopup("<b>RS PERTAMINA CIREBON</b> <br> RSP CIREBON", { autoClose: false });
+
+        var littleton = L.marker([-7.212662324957308, 112.73318028047231]).bindPopup('This is Littleton, CO.'),
+        denver    = L.marker([-6.239806910439034, 106.79326546813473]).bindPopup('This is Denver, CO.'),
+        aurora    = L.marker([-6.177354973287332, 106.83163609999998]).bindPopup('This is Aurora, CO.'),
+        golden    = L.marker([-6.683915904218249, 108.55214557999425]).bindPopup('This is Golden, CO.');
+
+        var cities = L.layerGroup([littleton, denver, aurora, golden]);
+        
+        var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        });
+        
+        var osmHOT = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap contributors, Tiles style by Humanitarian OpenStreetMap Team hosted by OpenStreetMap France'});
+        
+        var map = L.map('map', {
+            center: [-2.548926, 118.0148634],
+            zoom: 5,
+            layers: [osm, cities]
+        });
+
+        var baseMaps = {
+            "OpenStreetMap": osm,
+            "OpenStreetMap.HOT": osmHOT
+        };
+        
+        var overlayMaps = {
+            "Cities": cities
+        };
+
+        var layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
+
+        var crownHill = L.marker([-1.3013995792475732, 131.02109254647632]).bindPopup('This is Crown Hill Park.'),
+            rubyHill = L.marker([-0.8688915273531549, 131.31360354067974]).bindPopup('This is Ruby Hill Park.');
+            
+        var parks = L.layerGroup([crownHill, rubyHill]);
+        var openTopoMap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: 'Map data: © OpenStreetMap contributors, SRTM | Map style: © OpenTopoMap (CC-BY-SA)'
+        });
+
+        layerControl.addBaseLayer(openTopoMap, "OpenTopoMap");
+        layerControl.addOverlay(parks, "Parks");
+    </script>
+</body>
+
+</html>

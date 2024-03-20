@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Canvas dengan Penanda SVG</title>
+<style>
+    canvas {
+        border: 1px solid black;
+        cursor: pointer;
+    }
+</style>
+</head>
+<body>
+<canvas id="Canvas" width="700" height="700"></canvas>
+
+<script>
+    var canvas = document.getElementById('Canvas');
+    var context = canvas.getContext("2d");
+    
+    // Map sprite
+    var mapSprite = new Image();
+    mapSprite.src = "https://www.researchgate.net/profile/Julia-Faucett/publication/11762904/figure/fig1/AS:277017187635202@1443057452480/Body-diagram-used-by-workers-to-indicate-their-musculoskeletal-symptoms.png";
+    
+    var Marker = function () {
+        this.Sprite = new Image();
+        this.Sprite.src = "https://img2.pngdownload.id/20180730/gio/kisspng-check-mark-x-mark-computer-icons-clip-art-cross-heart-5b5ea78a695c75.1672286615329299304316.jpg"
+        this.Width = 12;
+        this.Height = 20;
+        this.XPos = 0;
+        this.YPos = 0;
+    }
+    
+    var Markers = new Array();
+    //var Markers = JSON.parse(localStorage.getItem('markers')) || [];
+    //var Markers = [{"Sprite":{},"Width":12,"Height":20,"XPos":522,"YPos":15}];
+
+    var mouseClicked = function (mouse) {
+        // Get corrent mouse coords
+        var rect = canvas.getBoundingClientRect();
+        var mouseXPos = (mouse.x - rect.left);
+        var mouseYPos = (mouse.y - rect.top);
+    
+        console.log("Marker added");
+        
+        // Check if there is a marker at the clicked position, if yes, remove it
+        for (var i = 0; i < Markers.length; i++) {
+            var marker = Markers[i];
+            if (mouseXPos >= marker.XPos && mouseXPos <= marker.XPos + marker.Width &&
+                mouseYPos >= marker.YPos && mouseYPos <= marker.YPos + marker.Height) {
+                Markers.splice(i, 1);
+                saveMarkers();
+                return; // Exit function to prevent adding new marker if removing existing one
+            }
+        }
+    
+        // Move the marker when placed to a better location
+        var marker = new Marker();
+        marker.XPos = mouseXPos - (marker.Width / 2);
+        marker.YPos = mouseYPos - marker.Height;
+    
+        Markers.push(marker);
+        console.log(Markers);
+        saveMarkers();
+    }
+    
+    // Add mouse click event listener to canvas
+    canvas.addEventListener("mousedown", mouseClicked, false);
+    
+    var firstLoad = function () {
+        context.font = "15px Georgia";
+        context.textAlign = "center";
+    }
+    
+    firstLoad();
+    
+    var main = function () {
+        draw();
+    };
+    
+    var draw = function () {
+        // Clear Canvas
+        context.fillStyle = "#000";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+    
+        // Draw map
+        // Sprite, X location, Y location, Image width, Image height
+        // You can leave the image height and width off, if you do it will draw the image at default size
+        context.drawImage(mapSprite, 0, 0, 700, 700);
+    
+        // Draw markers
+        for (var i = 0; i < Markers.length; i++) {
+            var tempMarker = Markers[i];
+            // Draw marker
+            context.drawImage(tempMarker.Sprite, tempMarker.XPos, tempMarker.YPos, tempMarker.Width, tempMarker.Height);
+            console.log(tempMarker.Sprite);
+            //Calculate postion text
+            //var markerText = "Postion (X:" + tempMarker.XPos + ", Y:" + tempMarker.YPos;
+            var markerText = "";
+    
+            // Draw a simple box so you can see the position
+            var textMeasurements = context.measureText(markerText);
+            context.fillStyle = "#666";
+            context.globalAlpha = 0.7;
+            context.fillRect(tempMarker.XPos - (textMeasurements.width / 2), tempMarker.YPos - 15, textMeasurements.width, 20);
+            context.globalAlpha = 1;
+    
+            // Draw position above
+            context.fillStyle = "#000";
+            context.fillText(markerText, tempMarker.XPos, tempMarker.YPos);
+        }
+    };
+
+    function saveMarkers() {
+        for (var i = 0; i < Markers.length; i++) {
+            Markers[i].Sprite = Markers[i].Sprite;
+            console.log(Markers[i].Sprite)
+        }
+        localStorage.setItem('markers', JSON.stringify(Markers));
+    }
+    
+    setInterval(main, (1000 / 60)); // Refresh 60 times a second
+</script>
+</body>
+</html>

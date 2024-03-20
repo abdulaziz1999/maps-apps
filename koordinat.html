@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Canvas dengan Gambar dan Titik Interaktif</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="myCanvas" width="800" height="600"></canvas>
+
+    <script>
+        var canvas = document.getElementById("myCanvas");
+        var ctx = canvas.getContext("2d");
+        var koordinat = []; // Array untuk menyimpan koordinat titik-titik
+
+        // Fungsi untuk menggambar ulang semua titik
+        function redraw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Membersihkan canvas
+
+            // Menggambar gambar di bawah titik-titik
+            var img = new Image();
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                
+                // Menggambar setiap titik dari array koordinat di atas gambar
+                koordinat.forEach(function(point) {
+                    ctx.fillRect(point.x - 2.5, point.y - 2.5, 5, 5); // Menggambar titik
+                });
+            };
+            // Mengatur sumber gambar
+            img.src = 'https://www.researchgate.net/profile/Julia-Faucett/publication/11762904/figure/fig1/AS:277017187635202@1443057452480/Body-diagram-used-by-workers-to-indicate-their-musculoskeletal-symptoms.png';
+        }
+
+        // Fungsi untuk menambahkan titik ke array koordinat dan local storage
+        function addPoint(x, y) {
+            koordinat.push({ x: x, y: y }); // Menambahkan titik baru
+            localStorage.setItem('koordinat', JSON.stringify(koordinat)); // Simpan ke local storage
+            redraw(); // Menggambar ulang semua titik
+        }
+
+        // Fungsi untuk menghapus titik dari array koordinat dan local storage
+        function removePoint(x, y) {
+            koordinat.forEach(function(point, index) {
+                if (Math.abs(x - point.x) < 5 && Math.abs(y - point.y) < 5) {
+                    koordinat.splice(index, 1); // Menghapus titik
+                    localStorage.setItem('koordinat', JSON.stringify(koordinat)); // Simpan ke local storage
+                    redraw(); // Menggambar ulang semua titik
+                }
+            });
+        }
+
+        // Menambahkan event listener untuk klik pada canvas
+        canvas.addEventListener('click', function(event) {
+            var rect = canvas.getBoundingClientRect();
+            var x = event.clientX - rect.left;
+            var y = event.clientY - rect.top;
+
+            // Periksa apakah titik yang diklik adalah titik yang sudah ada
+            var isExistingPoint = false;
+            koordinat.forEach(function(point) {
+                if (Math.abs(x - point.x) < 5 && Math.abs(y - point.y) < 5) {
+                    isExistingPoint = true;
+                }
+            });
+
+            // Jika iya, hapus titik tersebut
+            if (isExistingPoint) {
+                removePoint(x, y);
+            } else {
+                // Jika tidak, tambahkan titik baru
+                addPoint(x, y);
+            }
+        });
+
+        // Memeriksa apakah ada data koordinat yang disimpan di local storage
+        var savedKoordinat = localStorage.getItem('koordinat');
+        if (savedKoordinat) {
+            koordinat = JSON.parse(savedKoordinat); // Memuat kembali data koordinat dari local storage
+            redraw(); // Menggambar ulang semua titik
+        }else{
+            redraw(); //
+        }
+    </script>
+</body>
+</html>
